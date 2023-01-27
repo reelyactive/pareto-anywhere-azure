@@ -1,9 +1,59 @@
 Pareto Anywhere for Azure
 =========================
 
-[Pareto Anywhere](https://www.reelyactive.com/pareto/anywhere/) open source middleware for [context-aware physical spaces](https://www.reelyactive.com/context-aware-physical-spaces), deployed as a stateless [Azure Function](https://azure.microsoft.com/products/functions/), consuming data from [Azure IoT Hub](https://azure.microsoft.com/products/iot-hub/).
+[Pareto Anywhere for Azure](https://www.reelyactive.com/pareto/anywhere/integrations/azure/) is the open source middleware that unlocks the value of the [ambient data](https://www.reelyactive.com/ambient-data/) arriving at your Azure IoT Hub.
 
-Learn more at [www.reelyactive.com/pareto/anywhere/integrations/azure/](https://www.reelyactive.com/pareto/anywhere/integrations/azure/)
+__Pareto Anywhere for Azure__ runs efficiently as a stateless [Azure Function](https://azure.microsoft.com/products/functions/), triggered by data forwarded from IoT infrastructure, such as [Aruba APs](https://www.reelyactive.com/pareto/anywhere/infrastructure/aruba/), to [Azure IoT Hub](https://azure.microsoft.com/products/iot-hub/).
+
+___Pareto Anywhere for Azure__ provides a single standard stream of real-time data, regardless of the underlying devices & technologies, which include Bluetooth Low Energy and EnOcean Alliance devices.  Dynamic ambient (__dynamb__) data is output as JSON: see our [Developer's Cheatsheet](https://reelyactive.github.io/diy/cheatsheet/) for details on our data structures.
+
+_Where to start?_
+- [Pareto Anywhere for Azure](https://www.reelyactive.com/pareto/anywhere/integrations/azure/) Home
+- [Run Pareto Anywhere for Azure](https://reelyactive.github.io/diy/pareto-anywhere-azure/) Tutorial
+
+
+Installation
+------------
+
+Clone this repository and, from the root of the __pareto-anywhere-azure__ folder, install the package dependencies with the following command:
+
+    npm install
+
+Then, in that same folder, create a file called local.settings.json, and paste in the following contents:
+
+
+    {
+      "IsEncrypted": false,
+      "Values": {
+        "FUNCTIONS_WORKER_RUNTIME": "node",
+        "AzureWebJobsStorage": "...",
+        "EventHubConnectionString": "...",
+        "WebPubSubConnectionString": "...",
+        "iot_hub_name": "...",
+        "event_hub_name": "...",
+        "web_pub_sub_hub_name": "..."
+      }
+    }
+
+Replace the ```"..."``` values with the appropriate strings from the Azure Portal, as explained in our [Run Pareto Anywhere for Azure](https://reelyactive.github.io/diy/pareto-anywhere-azure/) tutorial.
+
+
+Running locally
+---------------
+
+With the Azure CLI installed, run __pareto-anywhere-azure__ locally from its root folder with the following command:
+
+    func start
+
+
+Running on Azure
+----------------
+
+With the Azure CLI installed, push __pareto-anywhere-azure__ to Azure with the following command:
+
+    func azure functionapp publish <APP_NAME>
+
+Initially, and anytime there are changes to local.settings.json, append the flag ```--publish-local-settings -i``` to the above.
 
 
 Project History
@@ -33,7 +83,7 @@ License
 
 MIT License
 
-Copyright (c) 2022 [reelyActive](https://www.reelyactive.com)
+Copyright (c) 2022-2023 [reelyActive](https://www.reelyactive.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

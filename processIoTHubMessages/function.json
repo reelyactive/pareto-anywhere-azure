@@ -1,0 +1,34 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "ioTHubMessages",
+      "direction": "in",
+      "eventHubName": "%iot_hub_name%",
+      "connection": "EventHubConnectionString",
+      "cardinality": "many",
+      "consumerGroup": "$Default",
+      "dataType": "string"
+    },
+    {
+      "name": "deviceProfilesEnOcean",
+      "type": "blob",
+      "path": "deviceprofiles/enocean.json",
+      "connection": "AzureWebJobsStorage",
+      "direction": "in"
+    },
+    {
+      "type": "eventHub",
+      "name": "eventHubMessage",
+      "eventHubName": "%event_hub_name%",
+      "connection": "EventHubSendAppSetting",
+      "direction": "out"
+    },
+    {
+      "type": "webPubSub",
+      "name": "actions",
+      "hub": "%web_pub_sub_hub_name%",
+      "direction": "out"
+    }
+  ]
+}

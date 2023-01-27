@@ -1,0 +1,22 @@
+{
+  "bindings": [
+    {
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "route": "wsconnection"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    },
+    {
+      "type": "webPubSubConnection",
+      "name": "connection",
+      "hub": "%web_pub_sub_hub_name%",
+      "direction": "in"
+    }
+  ]
+}

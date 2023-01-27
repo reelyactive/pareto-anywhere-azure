@@ -1,3 +1,8 @@
+# Azure
+package-lock.json
+appsettings.json
+local.settings.json
+
 # Logs
 logs
 *.log
