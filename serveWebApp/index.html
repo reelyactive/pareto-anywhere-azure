@@ -13,6 +13,9 @@
         const res = await fetch(`/api/wsconnection?id=${1}`);
         const data = await res.json();
 
+        const deviceCount = document.querySelector('#deviceCount');
+        const dynambRate = document.querySelector('#dynambRate');
+
         let continuousDataTable = new ContinuousDataTable('#continuousData',
                                                           beaver.devices);
         let discreteDataTable = new DiscreteDataTable('#discreteData',
@@ -21,6 +24,10 @@
         beaver.stream(null, { wsUrl: data.url });
         beaver.on('connect', () => { connection.hidden = false; });
         beaver.on('dynamb', (dynamb) => discreteDataTable.handleDynamb(dynamb));
+        beaver.on('stats', (stats) => {
+          deviceCount.textContent = stats.numberOfDevices;
+          dynambRate.textContent = stats.eventsPerSecond.dynamb.toFixed(1);
+        });
       });
     </script>
     <title> Pareto Anywhere for Azure </title>
@@ -156,6 +163,17 @@
               </h1>
               <!-- Continuous -->
               <table id="continuousData"></table>
+              <!-- Stats -->
+              <ul class="list-inline text-ambient text-center my-4">
+                <li class="list-inline-item">
+                  <span id="deviceCount" class="display-5"> 0 </span>
+                  <span class="lead"> devices </span>
+                </li>
+                <li class="list-inline-item">
+                  <span id="dynambRate" class="display-6"> 0.0 </span>
+                  dynamb<sub>/s</sub>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
