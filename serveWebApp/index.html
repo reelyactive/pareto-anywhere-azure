@@ -5,22 +5,22 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description"
-          content="Pareto Anywhere for Azure Web App.">
+          content="Pareto Anywhere for Azure Web App by reelyActive.">
     <link rel="stylesheet"
           href="https://www.reelyactive.com/style/bootstrappyactive.min.css">
     <script>
       document.addEventListener("DOMContentLoaded", async function(event) {
         const res = await fetch(`/api/wsconnection?id=${1}`);
         const data = await res.json();
-        const socket = new WebSocket(data.url);
 
-        socket.addEventListener('open', () => { connection.hidden = false; });
-        socket.addEventListener('message', (event) => {
-          try {
-            cuttlefishDynamb.render(JSON.parse(event.data), latestdynamb);
-          }
-          catch(err) { console.error(err); }
-        });
+        let continuousDataTable = new ContinuousDataTable('#continuousData',
+                                                          beaver.devices);
+        let discreteDataTable = new DiscreteDataTable('#discreteData',
+                                                   { isClockDisplayed: true });
+
+        beaver.stream(null, { wsUrl: data.url });
+        beaver.on('connect', () => { connection.hidden = false; });
+        beaver.on('dynamb', (dynamb) => discreteDataTable.handleDynamb(dynamb));
       });
     </script>
     <title> Pareto Anywhere for Azure </title>
@@ -77,6 +77,26 @@
                 <li class="dropdown-divider"></li>
                 <li>
                   <a class="dropdown-item" target="_blank"
+                     href="https://github.com/reelyactive/beaver">
+                    <i class="fab fa-js"></i>
+                    beaver.js &nbsp;
+                    <span class="badge bg-light text-dark">
+                      <i class="fab fa-osi"></i> MIT
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" target="_blank"
+                     href="https://github.com/reelyactive/cuttlefish">
+                    <i class="fab fa-js"></i>
+                    cuttlefish.js &nbsp;
+                    <span class="badge bg-light text-dark">
+                      <i class="fab fa-osi"></i> MIT
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" target="_blank"
                      href="https://getbootstrap.com" >
                     <i class="fab fa-bootstrap"></i>
                     Bootstrap 5 &nbsp;
@@ -124,12 +144,19 @@
     <!-- Content -->
     <div class="container-fluid">
       <div class="row justify-content-center">
-        <div class="col-sm-12 col-md-10 col-lg-8 col-xl-6">
-          <h1 class="mt-4">
-            Pareto Anywhere for Azure
-          </h1>
-          <div id="latestdynamb" class="mt-5">
-            <span class="animate-breathing"> Waiting for data... </span>
+        <div class="col-md-12 col-lg-10 col-xl-8 col-xxl-10">
+          <div class="row justify-content-between mt-5">
+            <div class="col-12 col-xxl-5 mb-5 order-xxl-last">
+              <!-- Discrete -->
+              <table id="discreteData"></table>
+            </div>
+            <div class="col-12 col-xxl-5">
+              <h1 class="text-dark my-4">
+                Pareto Anywhere <em class="small text-muted">for Azure</em>
+              </h1>
+              <!-- Continuous -->
+              <table id="continuousData"></table>
+            </div>
           </div>
         </div>
       </div>
@@ -142,6 +169,7 @@
 
     <script defer src="https://www.reelyactive.com/js/fontawesome-reelyactive.min.js"></script>
     <script src="https://www.reelyactive.com/js/bootstrappyactive.bundle.min.js"></script>
-    <script src="https://www.reelyactive.com/js/cuttlefish-dynamb.js"></script>
+    <script src="https://www.reelyactive.com/js/beaver.js"></script>
+    <script src="https://www.reelyactive.com/js/cuttlefish-tables.js"></script>
   </body>
 </html>

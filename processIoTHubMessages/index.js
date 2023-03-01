@@ -83,11 +83,12 @@ module.exports = function(context, iotHubMessages) {
 
     // Output the DYNamic AMBient data message(s)
     dynambs.forEach(dynamb => {
-      let dynambString = JSON.stringify(dynamb);
+      let event = { type: "dynamb", data: dynamb };
+      let eventString = JSON.stringify(event);
 
-      context.bindings.outputEventHubMessage = dynambString;
+      context.bindings.outputEventHubMessage = eventString;
       context.bindings.actions = { actionName: "sendToAll",
-                                   data: dynambString };
+                                   data: eventString };
     });
 
   });
