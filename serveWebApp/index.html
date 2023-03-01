@@ -81,6 +81,16 @@
                     </span>
                   </a>
                 </li>
+                <li>
+                  <a class="dropdown-item" target="_blank"
+                     href="https://dtpr.io">
+                    <i class="fas fa-info-circle"></i>
+                    DTPR &nbsp;
+                    <span class="badge bg-light text-dark">
+                      <i class="fab fa-osi"></i> Apache-2.0
+                    </span>
+                  </a>
+                </li>
                 <li class="dropdown-divider"></li>
                 <li>
                   <a class="dropdown-item" target="_blank"
@@ -156,6 +166,17 @@
             <div class="col-12 col-xxl-5 mb-5 order-xxl-last">
               <!-- Discrete -->
               <table id="discreteData"></table>
+              <!-- Stats -->
+              <ul class="list-inline text-ambient text-center my-5">
+                <li class="list-inline-item">
+                  <span id="deviceCount" class="display-5"> 0 </span>
+                  <span class="lead"> devices </span>
+                </li>
+                <li class="list-inline-item">
+                  <span id="dynambRate" class="display-6"> 0.0 </span>
+                  dynamb<sub>/s</sub>
+                </li>
+              </ul>
             </div>
             <div class="col-12 col-xxl-5">
               <!-- Continuous -->
@@ -171,17 +192,45 @@
                   </tr>
                 </thead>
               </table>
-              <!-- Stats -->
-              <ul class="list-inline text-ambient text-center my-4">
-                <li class="list-inline-item">
-                  <span id="deviceCount" class="display-5"> 0 </span>
-                  <span class="lead"> devices </span>
-                </li>
-                <li class="list-inline-item">
-                  <span id="dynambRate" class="display-6"> 0.0 </span>
-                  dynamb<sub>/s</sub>
-                </li>
-              </ul>
+              <!-- DTPR -->
+              <div class="card rounded-4 border-0 bg-ambient bg-gradient my-5">
+                <div class="card-body">
+                  <div class="card-group text-center">
+                    <div class="card bg-white border-0">
+                      <img src="https://www.reelyactive.com/images/dtpr/purpose/inform.svg"
+                           class="card-img-top p-2" alt="Purpose">
+                      <div class="card-footer small text-truncate bg-transparent border-0">
+                        Inform
+                      </div>
+                    </div>
+                    <div class="card bg-white border-0">
+                      <img src="https://www.reelyactive.com/images/dtpr/tech/wave-yellow.svg"
+                           class="card-img-top p-2" alt="Technology">
+                      <div class="card-footer small text-truncate bg-transparent border-0">
+                        Radio-identification
+                      </div>
+                    </div>
+                    <div class="card bg-white border-0">
+                      <img src="https://www.reelyactive.com/images/dtpr/accountable/org.svg"
+                           class="card-img-top p-2" alt="Accountable">
+                      <div class="card-footer small text-truncate bg-transparent border-0">
+                        <a href="https://www.reelyactive.com/how-we-observe/#content"
+                           target="_blank" class="text-decoration-none">
+                          <i class="fas fa-external-link-alt"></i>
+                          reelyactive.com
+                        </a>
+                      </div>
+                    </div>
+                    <div class="card bg-white border-0">
+                      <img src="https://www.reelyactive.com/images/dtpr/retention/no.svg"
+                           class="card-img-top p-2" alt="Retention">
+                      <div class="card-footer small text-truncate bg-transparent border-0">
+                        No data retained
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
