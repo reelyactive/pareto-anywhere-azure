@@ -30,6 +30,7 @@
     "advlib-eep-vld": "^1.0.0",
     "advlib-eep-4bs": "^1.1.0",
     "advlib-eep-rps": "^1.0.0",
+    "mime-types": "^2.1.35",
     "sniffypedia": "^1.1.5"
   },
   "devDependencies": {
