@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": [ "get" ],
-      "route": "events"
+      "route": "{folder?}/{filename?}"
     },
     {
       "type": "http",

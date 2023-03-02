@@ -10,7 +10,7 @@
           href="https://www.reelyactive.com/style/bootstrappyactive.min.css">
     <script>
       document.addEventListener("DOMContentLoaded", async function(event) {
-        const res = await fetch(`/api/wsconnection?id=${1}`);
+        const res = await fetch(`/app/wsconnection?id=${1}`);
         const data = await res.json();
 
         const deviceCount = document.querySelector('#deviceCount');
