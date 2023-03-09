@@ -7,7 +7,10 @@ __Pareto Anywhere for Azure__ runs efficiently as a stateless [Azure Function](h
 
 __Pareto Anywhere for Azure__ provides a single standard stream of real-time data, regardless of the underlying devices & technologies, which include Bluetooth Low Energy and EnOcean Alliance.  Dynamic ambient (__dynamb__) data is output as JSON to [Azure Event Hub](https://azure.microsoft.com/products/event-hubs) from which it is easily relayed to any store, stream processor and/or application.
 
-_Where to start?_
+
+Getting Started
+---------------
+
 - [Pareto Anywhere for Azure](https://www.reelyactive.com/pareto/anywhere/integrations/azure/) overview on reelyActive
 - [Run Pareto Anywhere for Azure](https://reelyactive.github.io/diy/pareto-anywhere-azure/) by following a step-by-step tutorial
 - [Developer's Cheatsheet](https://reelyactive.github.io/diy/cheatsheet/) for details on the __dynamb__ data structure
@@ -21,7 +24,6 @@ Clone this repository and, from the root of the __pareto-anywhere-azure__ folder
     npm install
 
 Then, in that same folder, create a file called local.settings.json, and paste in the following contents:
-
 
     {
       "IsEncrypted": false,
@@ -46,6 +48,8 @@ With the Azure CLI installed, run __pareto-anywhere-azure__ locally from its roo
 
     func start
 
+Then browse to [localhost:7071/app/](http://localhost:7071/app/) to observe data in the web app served by the function.
+
 
 Running on Azure
 ----------------
@@ -55,6 +59,34 @@ With the Azure CLI installed, push __pareto-anywhere-azure__ to Azure with the f
     func azure functionapp publish <APP_NAME>
 
 Initially, and anytime there are changes to local.settings.json, append the flag ```--publish-local-settings -i``` to the above.
+
+Browse to ```<APP_NAME>.azurewebsites.net/app/``` to observe data in the web app served by the function.
+
+
+Data Structure
+--------------
+
+__pareto-anywhere-azure__ outputs events to the Event Hub and to the Web PubSub (for consumption in the web app) using the following structure:
+
+    {
+      "type": "dynamb",
+      "data": { }
+    }
+
+The type is always _dynamb_ (but _raddec_ and _spatem_ can be accommodated in future).  And the data is the _dynamb_ data structure itself: see the [reelyActive Developers Cheatsheet](https://reelyactive.github.io/diy/cheatsheet/) for details.
+
+An example of an event from a temperature & humidity sensor would be as follows:
+
+    {
+      "type": "dynamb",
+      "data": {
+        "deviceId": "ac233f000000",
+        "deviceIdType": 2,
+        "timestamp": 1645568542222,
+        "temperature": 21.77734375,
+        "relativeHumidity": 64.90625
+      }
+    }
 
 
 Project History
