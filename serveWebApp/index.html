@@ -18,7 +18,7 @@
         let continuousDataTable = new ContinuousDataTable('#continuousData',
                                                           beaver.devices);
         let discreteDataTable = new DiscreteDataTable('#discreteData',
-                                                   { isClockDisplayed: true });
+                                       { isClockDisplayed: true, maxRows: 10 });
 
         beaver.stream(null, { wsUrl: data.url });
         beaver.on('connect', () => { connection.hidden = false; });
@@ -164,18 +164,25 @@
           <div class="row justify-content-between mt-5">
             <div class="col-12 col-xxl-5 mb-5 order-xxl-last">
               <!-- Discrete -->
-              <table id="discreteData"></table>
-              <!-- Stats -->
-              <ul class="list-inline text-ambient text-center my-5">
-                <li class="list-inline-item">
-                  <span id="deviceCount" class="display-5"> 0 </span>
-                  <span class="lead"> devices </span>
-                </li>
-                <li class="list-inline-item">
-                  <span id="dynambRate" class="display-6"> 0.0 </span>
-                  dynamb<sub>/s</sub>
-                </li>
-              </ul>
+              <table id="discreteData">
+                <!-- Stats -->
+                <tfoot>
+                  <tr class="bg-ambient bg-gradient text-white">
+                    <td colspan="4">
+                      <ul class="list-inline text-center mb-1">
+                        <li class="list-inline-item">
+                          <span id="deviceCount" class="display-5"> 0 </span>
+                          <span class="lead"> devices </span>
+                        </li>
+                        <li class="list-inline-item">
+                          <span id="dynambRate" class="display-6"> 0.0 </span>
+                          dynamb<sub>/s</sub>
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
             <div class="col-12 col-xxl-5">
               <!-- Continuous -->
