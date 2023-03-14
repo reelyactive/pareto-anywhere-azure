@@ -1,19 +1,25 @@
 Pareto Anywhere for Azure
 =========================
 
-[Pareto Anywhere for Azure](https://www.reelyactive.com/pareto/anywhere/integrations/azure/) is the open source middleware that unlocks the value of the [ambient data](https://www.reelyactive.com/ambient-data/) arriving at your Azure IoT Hub.
+__Pareto Anywhere for Azure__ is the open source middleware that unlocks the value of the [ambient data](https://www.reelyactive.com/ambient-data/) arriving at your Azure IoT Hub.
+
+![Overview of Pareto Anywhere for Azure](https://reelyactive.github.io/pareto-anywhere-azure/images/overview.png)
 
 __Pareto Anywhere for Azure__ runs efficiently as a stateless [Azure Function](https://azure.microsoft.com/products/functions/), triggered by data forwarded from IoT infrastructure, such as [Aruba APs](https://www.reelyactive.com/pareto/anywhere/infrastructure/aruba/), to [Azure IoT Hub](https://azure.microsoft.com/products/iot-hub/).
 
 __Pareto Anywhere for Azure__ provides a single standard stream of real-time data, regardless of the underlying devices & technologies, which include Bluetooth Low Energy and EnOcean Alliance.  Dynamic ambient (__dynamb__) data is output as JSON to [Azure Event Hub](https://azure.microsoft.com/products/event-hubs) from which it is easily relayed to any store, stream processor and/or application.
 
+Learn more at: [www.reelyactive.com/pareto/anywhere/integrations/azure/](https://www.reelyactive.com/pareto/anywhere/integrations/azure/)
+
 
 Getting Started
 ---------------
 
-- [Pareto Anywhere for Azure](https://www.reelyactive.com/pareto/anywhere/integrations/azure/) overview on reelyActive
-- [Run Pareto Anywhere for Azure](https://reelyactive.github.io/diy/pareto-anywhere-azure/) by following a step-by-step tutorial
-- [Developer's Cheatsheet](https://reelyactive.github.io/diy/cheatsheet/) for details on the __dynamb__ data structure
+Follow our step-by-step tutorial to deploy __Pareto Anywhere for Azure__:
+- [Run Pareto Anywhere for Azure](https://reelyactive.github.io/diy/pareto-anywhere-azure/)
+
+Learn "owl" about the __dynamb__ JSON data output:
+- [Developer's Cheatsheet](https://reelyactive.github.io/diy/cheatsheet/)
 
 
 Installation
@@ -87,6 +93,18 @@ An example of an event from a temperature & humidity sensor would be as follows:
         "relativeHumidity": 64.90625
       }
     }
+
+
+Web App
+-------
+
+The web app provides an intuitive visualisation of the real-time event stream:
+
+![Pareto Anywhere for Azure web app](https://reelyactive.github.io/pareto-anywhere-azure/images/web-app-screenshot.png)
+
+The web app and all its dependencies are served by the Azure Function itself from the /serveWebApp folder and its subfolders.  Simply edit the index.html file and the dependencies as required, and the changes will appear as soon as the function restarts.
+
+See the [reelyActive Web Style Guide](https://reelyactive.github.io/web-style-guide/) to facilitate customisation, and the [beaver.js](https://github.com/reelyactive/beaver/) and [cuttlefish.js](https://github.com/reelyactive/cuttlefish/) client-side modules which collect and render the real-time dynamic ambient data, respectively.
 
 
 Project History
