@@ -86,7 +86,7 @@ module.exports = function(context, iotHubMessages) {
       let event = { type: "dynamb", data: dynamb };
       let eventString = JSON.stringify(event);
 
-      context.bindings.outputEventHubMessage = eventString;
+      context.bindings.eventHubMessage = eventString;
       context.bindings.actions = { actionName: "sendToAll",
                                    data: eventString };
     });
