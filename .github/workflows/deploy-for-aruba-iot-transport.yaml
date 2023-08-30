@@ -1,0 +1,159 @@
+# This workflow will create a new resource group and all resources to run
+# Pareto Anywhere for Azure with source data from Aruba IoT Transport for Azure.
+
+name: Deploy with support for Aruba IoT Transport for Azure
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_group:
+        description: 'Resource Group Name'
+        required: true
+        default: 'pareto-anywhere-azure'
+      azure_region:
+        description: 'Azure Region'
+        required: true
+        default: 'canadaeast'
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
+  NODE_VERSION: '16.x'
+  HUB_RULE_NAME: 'pareto-anywhere-hub-rule'
+  SLOT: 'production'
+  Config-iothubname: ''
+  Config-iothubendpoint: ''
+  Config-dpsname: ''
+  Config-namespacename: ''
+  Config-eventhubname: ''
+  Config-wpsname: ''
+  Config-wpsendpoint: ''
+  Config-storageaccountname: ''
+  Config-storageconnection: ''
+  Config-sendappsetting: ''
+  Config-functionappname: ''
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+    # Use the master branch
+    - uses: actions/checkout@master
+
+    # Login to Azure as CLUSTER_SERVICE_PRINCIPAL (from GitHub secrets)
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.CLUSTER_SERVICE_PRINCIPAL }}
+
+    # Install the Azure CLI
+    - name: Install azure-cli
+      uses: pietrobolcato/install-azure-cli-action@v1.0.1
+
+    # Create the IoT Hub for Aruba IoT Transport for Azure
+    - name: Create IoT Hub for Aruba IoT Transport for Azure
+      shell: bash
+      run: |
+        iothubname="aruba-iot-hub-$RANDOM"
+        echo "Config-iothubname=$iothubname" >> $GITHUB_ENV
+        az iot hub create --name ${{ env.Config-iothubname }} --resource-group ${{ github.event.inputs.resource_group }} --sku F1 --partition-count 2 --location ${{ github.event.inputs.azure_region }}
+        az iot hub device-identity create --hub-name ${{ env.Config-iothubname }}
+        export iothubendpoint=$(az iot hub connection-string show -n ${{ env.Config-iothubname }} --default --output tsv)
+        echo "Config-iothubendpoint=$iothubendpoint" >> $GITHUB_ENV
+        echo "iothubname: ${{ env.Config-iothubname }} using Connection String: ${{ env.Config-iothubendpoint }}"
+
+    # Create the Device Provisioning Service for Aruba IoT Transport for Azure
+    - name: Create Device Provisioning Service
+      shell: bash
+      run: |
+        dpsname="aruba-dps-$RANDOM"
+        echo "Config-dpsname=$dpsname" >> $GITHUB_ENV
+        az iot dps create --name $dpsname --resource-group ${{ github.event.inputs.resource_group }} --location ${{ github.event.inputs.azure_region }} --sku S1 --unit 1
+        az iot dps linked-hub create --dps-name $dpsname --resource-group ${{ github.event.inputs.resource_group }} --connection-string ${{ env.Config-iothubendpoint }} --location ${{ github.event.inputs.azure_region }}
+
+    # Create the Event Hub and Namespace
+    - name: Create Event Hub
+      shell: bash
+      run: |
+        namespacename="pareto-anywhere-events-$RANDOM"
+        eventhubname="pareto-anywhere-event-hub-$RANDOM"
+        echo "Config-namespacename=$namespacename" >> $GITHUB_ENV
+        echo "Config-eventhubname=$eventhubname" >> $GITHUB_ENV
+        echo "Event Hub name: ${{ env.Config-eventhubname }} using Namespace: ${{ env.Config-namespacename }}"
+        az eventhubs namespace create --name $namespacename --resource-group ${{ github.event.inputs.resource_group }}  -l ${{ github.event.inputs.azure_region }}
+        az eventhubs eventhub create  --name $eventhubname  --resource-group ${{ github.event.inputs.resource_group }} --namespace-name $namespacename
+        az eventhubs eventhub authorization-rule create --authorization-rule-name ${{ env.HUB_RULE_NAME }} --eventhub-name $eventhubname --namespace-name $namespacename --resource-group ${{ github.event.inputs.resource_group }} --rights Listen Send
+         sendappsetting=$(az eventhubs eventhub authorization-rule keys list --resource-group  ${{ github.event.inputs.resource_group }} --namespace-name ${{ env.Config-namespacename }} --eventhub-name ${{ env.Config-eventhubname }} --name ${{ env.HUB_RULE_NAME }} | jq .primaryConnectionString)
+         echo "Config-sendappsetting=$sendappsetting" >> $GITHUB_ENV
+
+    # Create the WebPubSub
+    - name: Create WebPubSub
+      shell: bash
+      run: |
+        export wpsname="pareto-anywhere-wps-$RANDOM"
+        echo "Config-pubsubname=$wpsname" >> $GITHUB_ENV
+        az webpubsub create --name $wpsname --resource-group ${{ github.event.inputs.resource_group }} --location ${{ github.event.inputs.azure_region }} --sku Free_F1
+        wpsendpoint=$(az webpubsub key show  --name $wpsname --resource-group ${{ github.event.inputs.resource_group }} --query primaryConnectionString --output tsv)
+        echo "Config-wpsendpoint=$wpsendpoint" >> $GITHUB_ENV
+
+    # Create the Storage Account
+    - name: Create Storage Account
+      shell: bash
+      run: |
+        export storageaccountame="paretoanywherestorage$RANDOM"
+        echo "Config-storageaccountname=$storageaccountname" >> $GITHUB_ENV
+        az storage account create --name $storageaccountname --resource-group ${{ github.event.inputs.resource_group }}  --sku Standard_LRS --location ${{ github.event.inputs.azure_region }} 
+        storageconnection=$(az storage account show-connection-string --name $storageaccountname --resource-group  ${{ github.event.inputs.resource_group }} --output tsv)
+        echo "Config-storageconnection=$storageconnection" >> $GITHUB_ENV
+
+    # Create Function App (and Pricing Plan)
+    - name: Create Function App
+      shell: bash
+      run: |
+        functionappname="pareto-anywhere-$RANDOM"
+        functionplan="pareto-anywhere-plan-$RANDOM"
+        skuplan="Y1"
+        functionsversion="4"
+        runtime="node"
+        echo "Config-functionappname=$functionappname" >> $GITHUB_ENV
+        az functionapp plan create --name $functionplan --resource-group ${{ github.event.inputs.resource_group }} --location ${{ github.event.inputs.azure_region }}  --sku $skuplan
+        az functionapp create --name $functionappname --storage-account ${{ env.Config-storageaccountname }} --plan $functionplan --resource-group ${{ github.event.inputs.resource_group }} --runtime $runtime --functions-version $functionsversion
+
+    - name: Setup Node ${{ env.NODE_VERSION }} Environment
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: 'Resolve Project Dependencies Using Npm'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        npm install
+        popd
+
+    - name: 'Run Azure Functions Action'
+      uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: ${{ env.Config-functionappname }}
+        slot-name: ${{ env.SLOT }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+    # Create Function App Configuration
+    - name: Set Function App Configuration
+      shell: bash
+      run: |
+        az functionapp config appsettings set --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }} --settings "AzureWebJobsStorage=${{ env.Config-storageconnection }}" 
+        az functionapp config appsettings set --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }} --settings "EventHubConnectionString=${{ env.Config-iothubendpoint }}"
+        az functionapp config appsettings set --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }} --settings "EventHubSendAppSetting=${{ env.Config-sendappsetting }}" 
+        az functionapp config appsettings set --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }} --settings "WebPubSubConnectionString=${{ env.Config-wpsendpoint }}"
+        az functionapp config appsettings set --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }} --settings "iot_hub_name=${{ env.Config-iothubname }}"
+        az functionapp config appsettings set --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }} --settings "event_hub_name=${{ env.Config-eventhubname }}"
+        az functionapp config appsettings set --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }} --settings "web_pub_sub_hub_name=${{ env.Config-wpsname }}"
+
+        az functionapp restart --name ${{ env.Config-functionappname }} --resource-group ${{ github.event.inputs.resource_group }}
+
+    # Print connection variables for Aruba IoT Transport for Azure
+    - name: 'Print Aruba IoT Transport for Azure Connection Variables'
+      run: echo "Connection Variables: $(az iot dps policy show --dps-name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --policy-name provisioningserviceowner)"
+      run: echo "DPS ID Scope: $(az iot dps show --name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --query properties.idScope -o tsv)"
+      run: echo "DPS Primary Key: $(az iot dps policy show --dps-name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --policy-name provisioningserviceowner --query primaryKey )"
