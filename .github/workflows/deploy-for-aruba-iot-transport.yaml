@@ -154,6 +154,8 @@ jobs:
 
     # Print connection variables for Aruba IoT Transport for Azure
     - name: 'Print Aruba IoT Transport for Azure Connection Variables'
-      run: echo "Connection Variables: $(az iot dps policy show --dps-name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --policy-name provisioningserviceowner)"
-      run: echo "DPS ID Scope: $(az iot dps show --name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --query properties.idScope -o tsv)"
-      run: echo "DPS Primary Key: $(az iot dps policy show --dps-name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --policy-name provisioningserviceowner --query primaryKey )"
+      shell: bash
+      run: |
+        echo "Connection Variables: $(az iot dps policy show --dps-name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --policy-name provisioningserviceowner)"
+        echo "DPS ID Scope: $(az iot dps show --name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --query properties.idScope -o tsv)"
+        echo "DPS Primary Key: $(az iot dps policy show --dps-name ${{ env.Config-dpsname }} --resource-group ${{ github.event.inputs.resource_group }} --policy-name provisioningserviceowner --query primaryKey )"
