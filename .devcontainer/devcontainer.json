@@ -4,5 +4,9 @@
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/azure-cli:1": {},
     "ghcr.io/jlaundry/devcontainer-features/azure-functions-core-tools:1": {}
+  },
+  "forwardPorts": [ 7071 ],
+  "portsAttributes": {
+    "7071": { "label": "function-app-preview" }
   }
 }
