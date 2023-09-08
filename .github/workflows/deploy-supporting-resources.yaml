@@ -1,0 +1,102 @@
+# This workflow will create an Event Hubs Namespace, Event Hub, Web PubSub and
+# Storage Account to support the Pareto Anywhere for Azure Function app.
+
+name: Deploy supporting resources for Function App
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_group:
+        description: 'Resource Group Name'
+        required: true
+        default: 'pareto-anywhere-azure'
+      azure_region:
+        description: 'Azure Region'
+        required: true
+        default: 'canadaeast'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUFFIX: $(date +"%Y%m%d")${{ github.run_id }}
+    steps:
+
+    # Confirm that SERVICE_PRINCIPAL exists as a GitHub Action secret
+    - name: Confirm that SERVICE_PRINCIPAL exists as a GitHub Action secret
+      run: |
+        if [ `echo ${{ secrets.SERVICE_PRINCIPAL }} | wc -c` -lt 2 ]; then
+          echo This Action requires a "SERVICE_PRINCIPAL" secret;
+          exit 1;
+        fi
+
+    # Confirm that SUBSCRIPTION_ID exists as a GitHub Action secret
+    - name: Confirm that SUBSCRIPTION_ID exists as a GitHub Action secret
+      run: |
+        if [ `echo ${{ secrets.SUBSCRIPTION_ID }} | wc -c` -lt 2 ]; then
+          echo This Action requires a "SUBSCRIPTION_ID" secret;
+          exit 1;
+        fi
+
+    # Use the master branch
+    - uses: actions/checkout@master
+
+    # Login to Azure as SERVICE_PRINCIPAL (from GitHub Action secrets)
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.SERVICE_PRINCIPAL }}
+
+    # Install the Azure CLI
+    - name: Install azure-cli
+      uses: pietrobolcato/install-azure-cli-action@v1.0.1
+
+    # Set the SUBSCRIPTION_ID (from GitHub Action secrets)
+    - name: Set default subscription
+      run: az account set --subscription ${{ secrets.SUBSCRIPTION_ID }}
+
+    # Create the environment variables
+    - name: Create environment variables
+      shell: bash
+      run: |
+        echo "NAMESPACE_NAME=pareto-anywhere-events-${{ env.SUFFIX }}" >> $GITHUB_ENV
+        echo "EVENT_HUB_NAME=pareto-anywhere-event-hub-${{ env.SUFFIX }}" >> $GITHUB_ENV
+        echo "WPS_NAME=pareto-anywhere-wps-${{ env.SUFFIX }}" >> $GITHUB_ENV
+        echo "STORAGE_ACCOUNT_NAME=store${{ env.SUFFIX }}" >> $GITHUB_ENV
+
+    # Create the Event Hub and Namespace
+    - name: Create Event Hub
+      shell: bash
+      run: |
+        az eventhubs namespace create --name ${{ env.NAMESPACE_NAME }} --resource-group ${{ github.event.inputs.resource_group }}  -l ${{ github.event.inputs.azure_region }}
+        az eventhubs eventhub create --name ${{ env.EVENT_HUB_NAME }} --resource-group ${{ github.event.inputs.resource_group }} --namespace-name ${{ env.NAMESPACE_NAME }}
+        az eventhubs eventhub authorization-rule create --authorization-rule-name pareto-anywhere-hub-rule --eventhub-name ${{ env.EVENT_HUB_NAME }} --namespace-name ${{ env.NAMESPACE_NAME }} --resource-group ${{ github.event.inputs.resource_group }} --rights Listen Send
+        sendappsetting=$(az eventhubs eventhub authorization-rule keys list --resource-group  ${{ github.event.inputs.resource_group }} --namespace-name ${{ env.NAMESPACE_NAME }} --eventhub-name ${{ env.EVENT_HUB_NAME }} --name pareto-anywhere-hub-rule | jq .primaryConnectionString)
+        echo "SEND_APP_SETTING=$sendappsetting" >> $GITHUB_ENV
+        echo "Created Event Hub ${{ env.EVENT_HUB_NAME }} using Namespace ${{ env.NAMESPACE_NAME }}"
+
+    # Create the WebPubSub
+    - name: Create WebPubSub
+      shell: bash
+      run: |
+        az webpubsub create --name ${{ env.WPS_NAME }} --resource-group ${{ github.event.inputs.resource_group }} --location ${{ github.event.inputs.azure_region }} --sku Free_F1
+        wpsendpoint=$(az webpubsub key show --name ${{ env.WPS_NAME }} --resource-group ${{ github.event.inputs.resource_group }} --query primaryConnectionString --output tsv)
+        echo "WPS_ENDPOINT=$wpsendpoint" >> $GITHUB_ENV
+
+    # Create the Storage Account
+    - name: Create Storage Account
+      shell: bash
+      run: |
+        az storage account create --name ${{ env.STORAGE_ACCOUNT_NAME }} --resource-group ${{ github.event.inputs.resource_group }} --sku Standard_LRS --location ${{ github.event.inputs.azure_region }} 
+        storageconnectionstring=$(az storage account show-connection-string --name ${{ env.STORAGE_ACCOUNT_NAME }} --resource-group ${{ github.event.inputs.resource_group }} --output tsv)
+        echo "STORAGE_CONNECTION_STRING=$storageconnectionstring" >> $GITHUB_ENV
+
+    # Print the required names and connection strings
+    - name: Print required names and connection strings
+      shell: bash
+      run: |
+        echo "Copy the following into your local.settings.json"
+        echo "\"AzureWebJobsStorage\": \"${{ env.STORAGE_CONNECTION_STRING }}\","
+        echo "\"EventHubSendAppSetting\": \"${{ env.SEND_APP_SETTING }}\","
+        echo "\"WebPubSubConnectionString\": \"${{ env.WPS_ENDPOINT }}\","
+        echo "\"event_hub_name\": \"${{ env.EVENT_HUB_NAME }}\","
+        echo "\"web_pub_sub_hub_name\": \"${{ env.WPS_NAME }}\","
