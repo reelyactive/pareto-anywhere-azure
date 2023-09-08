@@ -107,6 +107,22 @@ The web app and all its dependencies are served by the Azure Function itself fro
 See the [reelyActive Web Style Guide](https://reelyactive.github.io/web-style-guide/) to facilitate customisation, and the [beaver.js](https://github.com/reelyactive/beaver/) and [cuttlefish.js](https://github.com/reelyactive/cuttlefish/) client-side modules which collect and render the real-time dynamic ambient data, respectively.
 
 
+GitHub Codespaces
+-----------------
+
+__pareto-anywhere-azure__ supports [GitHub Codespaces](https://github.com/features/codespaces/) for development/deployment within the browser rather than a local installation.  The project Codespace is configured to include:
+- Node.js
+- Azure CLI
+- Azure Functions Core Tools
+- Port forwarding on 7071
+
+
+GitHub Actions
+--------------
+
+__pareto-anywhere-azure__ supports [GitHub Actions](https://github.com/features/actions/) to automate the deployment of Azure resources.  This is currently under development, with experimental workflows available in the .github/workflows subfolder.
+
+
 Project History
 ---------------
 
