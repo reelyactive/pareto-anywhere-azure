@@ -25,7 +25,7 @@ Learn "owl" about the __dynamb__ JSON data output:
 Deployment using ARM templates
 ------------------------------
 
-__Pareto Anywhere for Azure__ can be deployed in minutes to an Azure Resource Group using the infrastructure-as-code ARM templates found in the /deployments folder of this repository.  The only prerequisites are:
+__Pareto Anywhere for Azure__ can be deployed in minutes to an Azure Resource Group using the infrastructure-as-code Azure Resource Manager (ARM) templates found in the /deployments folder of this repository.  The only prerequisites are:
 - an Azure account
 - an Azure subscription
 - an Azure Resource Group
