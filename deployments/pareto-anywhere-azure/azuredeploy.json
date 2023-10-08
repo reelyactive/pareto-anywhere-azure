@@ -28,14 +28,14 @@
             "metadata": {
                 "description": "Name of Web PubSub to create."
             },
-            "defaultValue": "[concat(resourceGroup().name, 'wps')]"
+            "defaultValue": "[concat(replace(resourceGroup().name, '-', ''), 'wps')]"
         },
         "storageAccountName": {
             "type": "string",
             "metadata": {
                 "description": "Name of Storage Account to create."
             },
-            "defaultValue": "[concat(resourceGroup().name, 'storage')]"
+            "defaultValue": "[concat(replace(resourceGroup().name, '-', ''), 'storage')]"
         },
         "functionName": {
             "type": "string",
@@ -198,9 +198,9 @@
             "properties": {
                 "retentionDescription": {
                     "cleanupPolicy": "Delete",
-                    "retentionTimeInHours": 168
+                    "retentionTimeInHours": 24
                 },
-                "messageRetentionInDays": 7,
+                "messageRetentionInDays": 1,
                 "partitionCount": 1,
                 "status": "Active"
             }
