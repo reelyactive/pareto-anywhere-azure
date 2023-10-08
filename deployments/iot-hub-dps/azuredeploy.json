@@ -1,0 +1,59 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "iotHubName": {
+            "type": "string",
+            "metadata": {
+              "description": "Name of IoT Hub to create"
+            },
+            "defaultValue": "[concat(resourceGroup().name, '-iot-hub')]"
+        },
+        "deviceProvisioningServiceName": {
+            "type": "string",
+            "metadata": {
+              "description": "Name of IoT Hub Device Provisioning Service to create"
+            },
+            "defaultValue": "[concat(resourceGroup().name, '-dps')]"
+        }
+    },
+    "variables": {
+        "iotHubKey": "iothubowner",
+        "iotHubSkuName": "S1",
+        "iotHubSkuUnits": 1
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Devices/IotHubs",
+            "apiVersion": "2021-07-02",
+            "name": "[parameters('iotHubName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+              "name": "[variables('iotHubSkuName')]",
+              "capacity": "[variables('iotHubSkuUnits')]"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Devices/provisioningServices",
+            "apiVersion": "2022-02-05",
+            "name": "[parameters('deviceProvisioningServiceName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+              "name": "[variables('iotHubSkuName')]",
+              "capacity": "[variables('iotHubSkuUnits')]"
+            },
+            "properties": {
+              "iotHubs": [
+                {
+                  "connectionString": "[format('HostName={0};SharedAccessKeyName={1};SharedAccessKey={2}', reference(resourceId('Microsoft.Devices/IotHubs', parameters('iotHubName')), '2021-07-02').hostName, variables('iotHubKey'), listkeys(resourceId('Microsoft.Devices/IotHubs', parameters('iotHubName')), '2021-07-02').value[0].primaryKey)]",
+                  "location": "[resourceGroup().location]"
+                }
+              ]
+            },
+            "dependsOn": [
+              "[resourceId('Microsoft.Devices/IotHubs', parameters('iotHubName'))]"
+            ]
+        }
+    ]
+}

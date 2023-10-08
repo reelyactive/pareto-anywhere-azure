@@ -1,0 +1,9 @@
+{
+  "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+  "type": "QuickStart",
+  "itemDisplayName": "Create an IoT Hub and DPS",
+  "description": "This template creates, within an existing Resource Group, an IoT Hub and Device Provisioning Service.",
+  "summary": "Create an IoT Hub and DPS within an existing Resource Group.",
+  "githubUsername": "reelyactive",
+  "dateUpdated": "2023-10-07"
+}

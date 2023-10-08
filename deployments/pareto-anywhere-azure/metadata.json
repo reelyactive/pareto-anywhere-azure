@@ -1,0 +1,9 @@
+{
+  "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+  "type": "QuickStart",
+  "itemDisplayName": "Deploy Pareto Anywhere for Azure",
+  "description": "This template creates, within an existing Resource Group having an IoT Hub, a Pareto Anywhere for Azure Function App with supporting resources.",
+  "summary": "Deploy Pareto Anywhere for Azure within an existing Resource Group having an IoT Hub.",
+  "githubUsername": "reelyactive",
+  "dateUpdated": "2023-10-07"
+}
