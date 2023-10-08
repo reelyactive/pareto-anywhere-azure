@@ -22,8 +22,29 @@ Learn "owl" about the __dynamb__ JSON data output:
 - [Developer's Cheatsheet](https://reelyactive.github.io/diy/cheatsheet/)
 
 
-Installation
-------------
+Deployment using ARM templates
+------------------------------
+
+__Pareto Anywhere for Azure__ can be deployed in minutes to an Azure Resource Group using the infrastructure-as-code ARM templates found in the /deployments folder of this repository.  The only prerequisites are:
+- an Azure account
+- an Azure subscription
+- an Azure Resource Group
+
+### Step 1: Deploy an IoT Hub and Device Provisioning Service
+
+If the Azure Resource Group already includes an IoT Hub, skip ahead to Step 2.  Otherwise, either manually create an IoT Hub or deploy one to a Resource Group via ARM template by clicking the Deploy link below:
+
+[![Deploy IoT Hub and DPS](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fiot-hub-dps%2Fazuredeploy.json)
+
+### Step 2: Deploy Pareto Anywhere for Azure and supporting resources
+
+Deploy to a Resource Group via ARM template by clicking the Deploy link below:
+
+[![Deploy Pareto Anywhere for Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fpareto-anywhere-azure%2Fazuredeploy.json)
+
+
+Manual Installation
+-------------------
 
 Clone this repository and, from the root of the __pareto-anywhere-azure__ folder, install the package dependencies with the following command:
 
