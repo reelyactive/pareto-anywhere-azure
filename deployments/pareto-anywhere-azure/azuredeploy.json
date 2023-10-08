@@ -376,7 +376,7 @@
                         "[concat('Microsoft.Web/sites/', parameters('functionName'))]"
                     ],
                     "properties": {
-                        "packageUri": "[variables('functionPackageUri')]"
+                        "packageUri": "[parameters('functionPackageUri')]"
                     }
                 }
             ]
