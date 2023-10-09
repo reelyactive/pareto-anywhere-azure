@@ -49,7 +49,7 @@
             "metadata": {
                 "description": "URI of function package to deploy (default recommended)."
             },
-            "defaultValue": "https://raw.githubusercontent.com/reelyactive/pareto-anywhere-azure/deployments/pareto-anywhere-azure/packages/function-app.zip"
+            "defaultValue": "https://raw.githubusercontent.com/reelyactive/pareto-anywhere-azure/master/deployments/pareto-anywhere-azure/packages/function-app.zip"
         }
     },
     "variables": {
@@ -387,17 +387,6 @@
                     "Send"
                 ]
             }
-        },
-        {
-            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-            "apiVersion": "2023-01-01-preview",
-            "name": "[concat(parameters('eventHubNamespaceName'), '/', parameters('eventHubName'), '/$Default')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-                "[resourceId('Microsoft.EventHub/namespaces', parameters('eventHubNamespaceName'))]"
-            ],
-            "properties": {}
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
