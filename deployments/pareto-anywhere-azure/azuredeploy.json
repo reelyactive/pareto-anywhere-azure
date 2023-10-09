@@ -273,7 +273,7 @@
         },
         {
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2022-09-01",
+            "apiVersion": "2022-03-01",
             "name": "[parameters('functionName')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
@@ -286,7 +286,6 @@
             "kind": "functionapp,linux",
             "properties": {
                 "reserved": true,
-                "enabled": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
                 "siteConfig": {
                     "linuxFxVersion": "node|18",
@@ -346,24 +345,14 @@
                         {
                             "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
                             "value": true
+                        },
+                        {
+                          "name": "WEBSITE_RUN_FROM_PACKAGE",
+                          "value": "[parameters('functionPackageUri')]"
                         }
                     ]
                 }
-            },
-            "resources": [
-                {
-                    "name": "ZipDeploy",
-                    "type": "Extensions",
-                    "location": "[resourceGroup().location]",
-                    "apiVersion": "2021-02-01",
-                    "dependsOn": [
-                        "[concat('Microsoft.Web/sites/', parameters('functionName'))]"
-                    ],
-                    "properties": {
-                        "packageUri": "[parameters('functionPackageUri')]"
-                    }
-                }
-            ]
+            }
         },
         {
             "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
