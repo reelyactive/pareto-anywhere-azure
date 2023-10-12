@@ -147,16 +147,15 @@
           "name": "[variables('planName')]",
           "location": "[resourceGroup().location]",
           "sku": {
-            "name": "Y1",
-            "tier": "Dynamic",
-            "size": "Y1",
-            "family": "Y",
-            "capacity":0
+            "tier": "ElasticPremium",
+            "name": "EP1",
+            "family": "EP"
           },
           "properties": {
-            "computeMode": "Dynamic",
+            "maximumElasticWorkerCount": 20,
             "reserved": true
-          }
+          },
+          "kind": "elastic"
         },
         {
             "type": "Microsoft.EventHub/namespaces/authorizationrules",
@@ -291,24 +290,8 @@
                     "linuxFxVersion": "node|18",
                     "appSettings": [
                         {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "node"
-                        },
-                        {
-                            "name": "WEBSITE_ENABLE_SYNC_UPDATE_SITE",
-                            "value": true
-                        },
-                        {
-                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
-                            "value": "~18"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "name": "AzureWebJobsStorage",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2015-05-01-preview').key1)]"
-                        },
-                        { 
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[parameters('functionName')]" 
                         },
                         {
                             "name": "event_hub_name",
@@ -335,16 +318,28 @@
                             "value": "[listkeys(resourceId('Microsoft.SignalRService/WebPubSub', parameters('webPubSubName')), '2023-06-01-preview').primaryConnectionString]"
                         },
                         {
-                            "name": "AzureWebJobsStorage",
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                             "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2015-05-01-preview').key1)]"
+                        },
+                        { 
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(parameters('functionName'))]" 
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~4"
                         },
                         {
-                            "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-                            "value": true
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "node"
+                        },
+                        {
+                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                            "value": "~18"
+                        },
+                        {
+                          "name": "WEBSITE_RUN_FROM_PACKAGE",
+                          "value": "1"
                         }
                     ]
                 }
