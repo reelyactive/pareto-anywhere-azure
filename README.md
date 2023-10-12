@@ -42,6 +42,8 @@ Deploy to a Resource Group via ARM template by clicking the Deploy link below:
 
 [![Deploy Pareto Anywhere for Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fpareto-anywhere-azure%2Fazuredeploy.json)
 
+The ARM template will deploy the __pareto-anywhere-azure__ Azure Function under the Windows Consumption plan which strikes a balance between installation ease & speed, and operational costs.  Consult the official [ARM template documentation](https://learn.microsoft.com/azure/azure-resource-manager/templates/) or contact your Microsoft rep to adapt these templates to your requirements.
+
 
 Manual Installation
 -------------------
