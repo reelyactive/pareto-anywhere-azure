@@ -223,27 +223,6 @@
             }
         },
         {
-            "type": "Microsoft.Storage/storageAccounts/fileServices",
-            "apiVersion": "2023-01-01",
-            "name": "[concat(parameters('storageAccountName'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-            ],
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "properties": {
-                "cors": {
-                    "corsRules": []
-                },
-                "deleteRetentionPolicy": {
-                    "allowPermanentDelete": false,
-                    "enabled": false
-                }
-            }
-        },
-        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2022-03-01",
             "name": "[parameters('functionName')]",
