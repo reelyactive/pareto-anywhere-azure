@@ -147,15 +147,14 @@
           "name": "[variables('planName')]",
           "location": "[resourceGroup().location]",
           "sku": {
-            "tier": "ElasticPremium",
-            "name": "EP1",
-            "family": "EP"
+              "name": "Y1",
+              "tier": "Dynamic",
+              "size": "Y1",
+              "family": "Y"
           },
           "properties": {
-            "maximumElasticWorkerCount": 20,
-            "reserved": true
-          },
-          "kind": "elastic"
+            "computeMode": "Dynamic"
+          }
         },
         {
             "type": "Microsoft.EventHub/namespaces/authorizationrules",
@@ -282,12 +281,10 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
                 "[resourceId('Microsoft.SignalRService/WebPubSub', parameters('webPubSubName'))]"
             ],
-            "kind": "functionapp,linux",
+            "kind": "functionapp",
             "properties": {
-                "reserved": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
                 "siteConfig": {
-                    "linuxFxVersion": "node|18",
                     "appSettings": [
                         {
                             "name": "AzureWebJobsStorage",
@@ -336,10 +333,6 @@
                         {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
                             "value": "~18"
-                        },
-                        {
-                          "name": "ENABLE_ORYX_BUILD",
-                          "value": true
                         },
                         {
                             "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
