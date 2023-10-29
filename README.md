@@ -15,8 +15,9 @@ Learn more at: [www.reelyactive.com/pareto/anywhere/integrations/azure/](https:/
 Getting Started
 ---------------
 
-Follow our step-by-step tutorial to deploy __Pareto Anywhere for Azure__:
+Follow our step-by-step tutorials to deploy __Pareto Anywhere for Azure__:
 - [Run Pareto Anywhere for Azure](https://reelyactive.github.io/diy/pareto-anywhere-azure/)
+- [Run Pareto Anywhere for Azure with Aruba APs](https://reelyactive.github.io/diy/pareto-anywhere-azure-aruba/)
 
 Learn "owl" about the __dynamb__ JSON data output:
 - [Developer's Cheatsheet](https://reelyactive.github.io/diy/cheatsheet/)
