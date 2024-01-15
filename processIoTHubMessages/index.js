@@ -1,5 +1,5 @@
 /**
- * Copyright reelyActive 2022-2023
+ * Copyright reelyActive 2022-2024
  * We believe in an open Internet of Things
  */
 
@@ -18,7 +18,8 @@ const ENOCEAN_PROCESSOR = {
     processor: require('advlib-esp'),
     libraries: [ require('advlib-eep-vld'),
                  require('advlib-eep-4bs'),
-                 require('advlib-eep-rps') ],
+                 require('advlib-eep-rps'),
+                 require('advlib-eep-msc') ],
     options: { ignoreProtocolOverhead: true,
                indices: [ require('sniffypedia') ] }
 };
@@ -31,6 +32,7 @@ const DEFAULT_DYNAMB_PROPERTIES = [
     'angleOfRotation',
     'batteryPercentage',
     'batteryVoltage',
+    'carbonDioxideConcentration,
     'elevation',
     'heading',
     'heartRate',
@@ -41,6 +43,8 @@ const DEFAULT_DYNAMB_PROPERTIES = [
     'isMotionDetected',
     'magneticField',
     'nearest',
+    'numberOfOccupants',
+    'passageCounts',
     'position',
     'pressure',
     'relativeHumidity',
