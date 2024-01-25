@@ -1,5 +1,5 @@
 /**
- * Copyright reelyActive 2023
+ * Copyright reelyActive 2023-2024
  * We believe in an open Internet of Things
  */
 
@@ -40,6 +40,7 @@ const DISCRETE_TIMESTAMP_OPTIONS = { hour: "2-digit", minute: "2-digit",
                                      second: "2-digit", hour12: false };
 const DISCRETE_DATA_STALE_MILLISECONDS = 60000;
 const DISCRETE_DATA_ANIMATE_MILLISECONDS = 15000;
+const DEFAULT_DEVICE_FILTER = function(device) { return true; };
 
 
 /**
@@ -99,12 +100,12 @@ class ContinuousDataTable {
       let i = createElement('i', iconClass + ' text-white display-4');
       let th = createElement('th', 'bg-dark align-middle', i);
       let spanContent = '\u2014' + (DYNAMB_PROPERTY_UNITS[property] || '');
-      let spanAvg = createElement('span', 'text-muted', spanContent);
+      let spanAvg = createElement('span', 'text-body-secondary', spanContent);
       let tdAvg = createElement('td', 'align-middle display-4', spanAvg);
-      let spanMax = createElement('span', 'text-muted', '\u2014');
-      let spanMin = createElement('span', 'text-muted', '\u2014');
-      let supMax = createElement('sup', 'text-muted', '\u00a0 max');
-      let subMin = createElement('sub', 'text-muted', '\u00a0 min');
+      let spanMax = createElement('span', 'text-body-secondary', '\u2014');
+      let spanMin = createElement('span', 'text-body-secondary', '\u2014');
+      let supMax = createElement('sup', 'text-body-secondary', '\u00a0 max');
+      let subMin = createElement('sub', 'text-body-secondary', '\u00a0 min');
       let liMax = createElement('li', 'list-group-item', [ spanMax, supMax ]);
       let liMin = createElement('li', 'list-group-item', [ spanMin, subMin ]);
       let ul = createElement('ul', 'list-group list-group-flush',
@@ -162,13 +163,13 @@ class ContinuousDataTable {
         avgDisplay.textContent = average.toFixed(precision);
         let isAvgInBounds = (average <= self.propertyBounds[property].max) &&
                             (average >= self.propertyBounds[property].min);
-        let avgClass = isAvgInBounds ? 'text-dark' : 'text-secondary';
+        let avgClass = isAvgInBounds ? 'text-body' : 'text-secondary';
         avgDisplay.setAttribute('class', avgClass);
         isOutOfBounds ||= !isAvgInBounds;
       }
       else {
         avgDisplay.textContent = '\u2014';
-        avgDisplay.setAttribute('class', 'text-muted');
+        avgDisplay.setAttribute('class', 'text-body-tertiary');
       }
       avgDisplay.textContent += (DYNAMB_PROPERTY_UNITS[property] || '');
 
@@ -177,8 +178,8 @@ class ContinuousDataTable {
                             (maximum >= self.propertyBounds[property].min);
         let isMinInBounds = (minimum <= self.propertyBounds[property].max) &&
                             (minimum >= self.propertyBounds[property].min);
-        let maxClass = isMinInBounds ? 'text-dark' : 'text-secondary';
-        let minClass = isMinInBounds ? 'text-dark' : 'text-secondary';
+        let maxClass = isMinInBounds ? 'text-body-secondary' : 'text-secondary';
+        let minClass = isMinInBounds ? 'text-body-secondary' : 'text-secondary';
         maxDisplay.textContent = maximum.toFixed(precision) +
                                  (DYNAMB_PROPERTY_UNITS[property] || '');
         minDisplay.textContent = minimum.toFixed(precision) +
@@ -190,8 +191,8 @@ class ContinuousDataTable {
       else {
         maxDisplay.textContent = '\u2014';
         minDisplay.textContent = '\u2014';
-        maxDisplay.setAttribute('class', 'text-muted');
-        minDisplay.setAttribute('class', 'text-muted');
+        maxDisplay.setAttribute('class', 'text-body-tertiary');
+        minDisplay.setAttribute('class', 'text-body-tertiary');
       }
       
       let iconCellClass = isOutOfBounds ? 'bg-secondary align-middle' :
@@ -230,7 +231,8 @@ class DiscreteDataTable {
     this.digitalTwins = options.digitalTwins || new Map();
     this.propertiesToDisplay = options.propertiesToDisplay ||
                                [ 'isButtonPressed', 'isContactDetected',
-                                 'isMotionDetected', 'unicodeCodePoints' ];
+                                 'isLiquidDetected', 'isMotionDetected',
+                                 'unicodeCodePoints' ];
     
     this.render();
     periodicUpdate();
@@ -291,13 +293,13 @@ class DiscreteDataTable {
           let animateTimestamp = row.timestamp +
                                  DISCRETE_DATA_ANIMATE_MILLISECONDS;
           if(staleTimestamp < Date.now()) {
-            row.setAttribute('class', 'align-middle text-muted');
+            row.setAttribute('class', 'align-middle text-body-tertiary');
           }
           else {
             nextUpdateTime = Math.min(staleTimestamp, nextUpdateTime);
           }
           if(animateTimestamp < Date.now()) {
-            row.firstChild.setAttribute('class', '');
+            row.firstChild.setAttribute('class', 'text-body-secondary');
           }
           else {
             nextUpdateTime = Math.min(animateTimestamp, nextUpdateTime);
@@ -329,7 +331,7 @@ class DiscreteDataTable {
 
         if(event) {
           self.discreteData.set(id, current);
-          let row = tbody.querySelector('#' + id);
+          let row = document.getElementById(id);
 
           if(row) {
             updateDiscreteDataRow(row, event, deviceName, dynamb.timestamp);
@@ -348,12 +350,190 @@ class DiscreteDataTable {
     });
   }
 
-  // Update the digital twin of the identified entries(s)
+  /**
+   * Update the digital twin of the identified entries(s)
+   */
   updateDigitalTwin(deviceSignature, digitalTwin) {
     let deviceName = determineDeviceName(deviceSignature, digitalTwin || {});
     let namedNodes = document.getElementsByName(deviceSignature + '-name');
 
     namedNodes.forEach((node) => { node.textContent = deviceName; });
+  }
+}
+
+
+/**
+ * DevicesTable Class
+ * Manages the processing and rendering of devices in an HTML table.
+ */
+class DevicesTable {
+
+  /**
+   * DevicesTable constructor
+   * @param {String} elementId The id of the table in the HTML.
+   * @param {Object} options The options as a JSON object.
+   * @constructor
+   */
+  constructor(elementId, options) {
+    let self = this;
+    options = options || {};
+
+    this.table = document.querySelector(elementId);
+    this.beaver = options.beaver;
+    this.displayedDevices = new Map();
+    this.maxRows = options.maxRows || 12;
+    this.isClockDisplayed = options.isClockDisplayed || false;
+    this.digitalTwins = options.digitalTwins || new Map();
+    this.isFilteredDevice = options.isFilteredDevice || DEFAULT_DEVICE_FILTER;
+    this.selectedDeviceSignature;
+    this.eventCallbacks = { selection: [] };
+    
+    this.render();
+
+    if(self.beaver) {
+      self.beaver.on('appearance', (deviceSignature, device) => {
+        if(self.isFilteredDevice(device)) {
+          self.insertDevice(deviceSignature, device);
+        }
+      });
+      self.beaver.on('disappearance', (deviceSignature) => {
+        self.removeDevice(deviceSignature);
+      });
+    }
+
+    if(self.isClockDisplayed) { updateClock(); }
+
+    function updateClock() {
+      let time = new Date().toLocaleTimeString([], CLOCK_OPTIONS);
+      let millisecondsToNextMinute = 60000 - (Date.now() % 60000);
+      document.querySelector('#timeDisplay').textContent = time;
+      setTimeout(updateClock, millisecondsToNextMinute);
+    }
+  }
+
+  /**
+   * Render the HTML table from scratch.
+   */
+  render() {
+    let self = this;
+
+    if(self.isClockDisplayed) {
+      let time = new Date().toLocaleTimeString([], CLOCK_OPTIONS);
+      let td = createElement('td', 'bg-dark bg-gradient text-white display-1',
+                             time);
+      let tr = createElement('tr', null, td);
+      let thead = createElement('thead', null, tr);
+      td.setAttribute('colspan', '4');
+      td.setAttribute('id', 'timeDisplay');
+      self.table.appendChild(thead);
+    }
+
+    let tbody = createElement('tbody');
+    tbody.setAttribute('id', 'devicesRows');
+
+    self.table.setAttribute('class', 'table table-hover text-center');
+    self.table.appendChild(tbody);
+  }
+
+  /**
+   * Insert the given device.
+   */
+  insertDevice(deviceSignature, device) {
+    let self = this;
+    let isFullTable = (self.displayedDevices.size >= self.maxRows);
+
+    if(!isFullTable && !self.displayedDevices.has(deviceSignature) &&
+       self.isFilteredDevice(device)) {
+      let tbody = document.querySelector('#devicesRows');
+      let digitalTwin = self.digitalTwins.get(deviceSignature) || {};
+      let deviceName = determineDeviceName(deviceSignature, digitalTwin);
+      let id = deviceSignature.replace('/', '-') + '-device';
+      let row = createDeviceRow(id, deviceSignature, deviceName, self);
+
+      if(tbody.hasChildNodes() &&
+         (tbody.childNodes.length >= self.maxRows)) {
+        let removedDeviceSignature = tbody.lastChild.id.replace('-device', '')
+                                                       .replace('-', '/');
+        self.removeDevice(removedDeviceSignature);
+      }
+      tbody.insertBefore(row, tbody.firstChild);
+      self.displayedDevices.set(deviceSignature, device); // TODO value
+    }
+  }
+
+  /**
+   * Select the given device.
+   */
+  selectDevice(deviceSignature) {
+    let self = this;
+    let id, button;
+    let isUnselect = (self.selectedDeviceSignature === deviceSignature);
+    let isReplace = (self.selectedDeviceSignature && !isUnselect);
+
+    if(isUnselect || isReplace) {
+      id = self.selectedDeviceSignature.replace('/', '-') + '-button';
+      button = document.getElementById(id);
+
+      if(button) {
+        button.setAttribute('class', 'btn btn-sm btn-outline-primary');
+      }
+    }
+
+    if(deviceSignature && !isUnselect) {
+      id = deviceSignature.replace('/', '-') + '-button';
+      button = document.getElementById(id);
+
+      if(button) {
+        button.setAttribute('class', 'btn btn-sm btn-primary');
+      }
+    }
+
+    self.selectedDeviceSignature = isUnselect ? null : deviceSignature;
+    self.eventCallbacks.selection.forEach((callback) => {
+      callback(self.selectedDeviceSignature);
+    });
+  }
+
+  /**
+   * Remove the given device.
+   */
+  removeDevice(deviceSignature) {
+    let self = this;
+
+    if(self.displayedDevices.has(deviceSignature)) {
+      let id = deviceSignature.replace('/', '-') + '-device';
+      let tbody = document.querySelector('#devicesRows');
+      let row = document.getElementById(id);
+
+      tbody.removeChild(row);
+      self.displayedDevices.delete(deviceSignature);
+    }
+
+    if(self.selectedDeviceSignature === deviceSignature) {
+      self.selectDevice(null);
+    }
+  }
+
+  /**
+   * Update the digital twin of the identified entries(s)
+   */
+  updateDigitalTwin(deviceSignature, digitalTwin) {
+    let deviceName = determineDeviceName(deviceSignature, digitalTwin || {});
+    let namedNodes = document.getElementsByName(deviceSignature + '-name');
+
+    namedNodes.forEach((node) => { node.textContent = deviceName; });
+  }
+
+  /**
+   * Event callbacks.
+   */
+  on(event, callback) {
+    let isValidEvent = event && this.eventCallbacks.hasOwnProperty(event);
+    let isValidCallback = callback && (typeof callback === 'function');
+
+    if(isValidEvent && isValidCallback) {
+      this.eventCallbacks[event].push(callback);
+    }
   }
 }
 
@@ -382,6 +562,9 @@ function determineDiscreteDataEvent(property, current, previous) {
     case 'isContactDetected':
       return (current.includes(true) ? 'Contact detected' :
                                        'No contact detected');
+    case 'isLiquidDetected':
+      return (current.includes(true) ? 'Liquid detected' :
+                                       'No liquid detected');
     case 'isMotionDetected':
       return (current.includes(true) ? 'Motion detected' :
                                        'No motion detected');
@@ -402,13 +585,14 @@ function createDiscreteDataRow(id, property, description, deviceSignature,
                   DEFAULT_DYNAMB_PROPERTY_ICON_CLASS;
   let icon = createElement('i', iconClass + ' display-6');
   let iconCol = createElement('th', 'table-primary animate-breathing', icon);
-  let deviceCol = createElement('td', 'font-monospace', deviceName);
+  let deviceCol = createElement('td', 'font-monospace text-body-secondary',
+                                deviceName);
   let descriptionClass = (property === 'unicodeCodePoints') ? 'display-6' :
-                                                              'fw-bold';
+                                                  'fw-bold text-body-secondary';
   let descriptionCol = createElement('td', descriptionClass, description);
   let time = new Date(timestamp).toLocaleTimeString([],
                                                     DISCRETE_TIMESTAMP_OPTIONS);
-  let timestampCol = createElement('td', null, time);
+  let timestampCol = createElement('td', 'text-body-secondary', time);
   let tr = createElement('tr', 'align-middle',
                          [ iconCol, descriptionCol, deviceCol, timestampCol ]);
   deviceCol.setAttribute('name', deviceSignature + '-name');
@@ -431,6 +615,28 @@ function updateDiscreteDataRow(row, description, deviceName, timestamp) {
   timestampCol.textContent = new Date(timestamp).toLocaleTimeString([],
                                                    DISCRETE_TIMESTAMP_OPTIONS);
   row.timestamp = timestamp;
+}
+
+
+// Create a device row
+function createDeviceRow(id, deviceSignature, deviceName, instance) {
+  let deviceCol = createElement('td', 'font-monospace', deviceName);
+  let displayIcon = createElement('i', 'fas fa-eye');
+  let displayButton = createElement('button', 'btn btn-sm btn-outline-primary',
+                                    displayIcon);
+  let displayCol = createElement('td', null, displayButton);
+  let tr = createElement('tr', 'align-middle', [ deviceCol, displayCol ]);
+  deviceCol.setAttribute('name', deviceSignature + '-name');
+  displayButton.id = deviceSignature.replace('/', '-') + '-button';
+  tr.id = id;
+
+  displayButton.addEventListener('click', (event) => {
+    let selectedDeviceSignature = event.currentTarget.id.replace('-button', '')
+                                                        .replace('-', '/');
+    instance.selectDevice(selectedDeviceSignature);
+  });
+
+  return tr;
 }
 
 
