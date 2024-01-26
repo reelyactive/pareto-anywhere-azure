@@ -16,7 +16,8 @@ let beaver = (function() {
   // Internal variables
   let devices = new Map();
   let eventCallbacks = { connect: [], raddec: [], dynamb: [], spatem: [],
-                         stats: [], error: [], disconnect: [] };
+                         poll: [], appearance: [], disappearance: [], stats: [],
+                         error: [], disconnect: [] };
   let eventCounts = { raddec: 0, dynamb: 0, spatem: 0 };
   let staleDeviceMilliseconds = DEFAULT_STALE_DEVICE_MILLISECONDS;
   let updateMilliseconds = DEFAULT_UPDATE_MILLISECONDS;
@@ -76,6 +77,8 @@ let beaver = (function() {
     else {
       device = { raddec: raddec, nearest: createNearest(raddec) };
       devices.set(signature, device);
+      eventCallbacks['appearance'].forEach(callback => callback(signature,
+                                                                device));
     }
 
     eventCallbacks['raddec'].forEach(callback => callback(raddec));
@@ -101,6 +104,8 @@ let beaver = (function() {
         device.nearest = createNearest(device.raddec, device.dynamb);
       }
       devices.set(signature, device);
+      eventCallbacks['appearance'].forEach(callback => callback(signature,
+                                                                device));
     }
 
     eventCallbacks['dynamb'].forEach(callback => callback(dynamb));
@@ -122,6 +127,8 @@ let beaver = (function() {
     else {
       device = { spatem: createTrimmedSpatem(spatem) };
       devices.set(signature, device);
+      eventCallbacks['appearance'].forEach(callback => callback(signature,
+                                                                device));
     }
 
     eventCallbacks['spatem'].forEach(callback => callback(spatem));
@@ -132,7 +139,14 @@ let beaver = (function() {
   function handleContext(data) {
     if(data) {
       for(const signature in data.devices) {
-        devices.set(signature, data.devices[signature]); // TODO: merge?
+        if(!devices.has(signature)) {
+          devices.set(signature, data.devices[signature]);
+          eventCallbacks['appearance'].forEach(
+                      callback => callback(signature, data.devices[signature]));
+        }
+        else {
+          devices.set(signature, data.devices[signature]); // TODO: merge?
+        }
       }
     }
   }
@@ -165,6 +179,8 @@ let beaver = (function() {
     staleCollection.forEach((signature) => {
       if(!nearestCollection.includes(signature)) {
         devices.delete(signature);
+        eventCallbacks['disappearance'].forEach(
+                                               callback => callback(signature));
       }
     });
   }
@@ -295,6 +311,32 @@ let beaver = (function() {
     return streams;
   };
 
+  // Poll from the given server
+  let poll = function(serverRootUrl, options) {
+    options = options || {};
+    let queryUrl = serverRootUrl + '/context/';
+
+    if(options.deviceSignature) {
+      queryUrl += 'device/' + options.deviceSignature;
+    }
+    if(options.clearDevices) {
+      devices.clear();
+    }
+
+    retrieveJson(queryUrl, (data) => {
+      handleContext(data);
+      eventCallbacks['poll'].forEach(callback => callback());
+
+      if(Number.isInteger(options.intervalMilliseconds)) {
+        setTimeout(poll, options.intervalMilliseconds, serverRootUrl, options);
+      }
+    });
+
+    if(!updateTimeout) {
+      update(); // Start periodic updates
+    }
+  };
+
   // Register a callback for the given event
   let setEventCallback = function(event, callback) {
     let isValidEvent = event && eventCallbacks.hasOwnProperty(event);
@@ -308,6 +350,7 @@ let beaver = (function() {
   // Expose the following functions and variables
   return {
     stream: stream,
+    poll: poll,
     on: setEventCallback,
     devices: devices
   }

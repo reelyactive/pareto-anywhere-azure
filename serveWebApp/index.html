@@ -7,6 +7,7 @@
     <meta name="description"
           content="Pareto Anywhere for Azure Web App by reelyActive.">
     <link rel="stylesheet" href="style/bootstrappyactive.min.css">
+    <script type="module" src="js/color-modes.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async function(event) {
         const res = await fetch(`/app/wsconnection?id=${1}`);
@@ -33,8 +34,7 @@
   </head>
   <body>
     <!-- Navigation -->
-    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-white
-                shadow">
+    <nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary shadow">
       <div class="container-fluid">
         <a class="navbar-brand" href="https://www.reelyactive.com/">
           <img src="images/reelyactive-logo-square-nav.png"
@@ -60,6 +60,36 @@
               <a id="connection" class="nav-link" hidden>
                 <i class="fas fa-cloud text-success"></i>
               </a>
+            </li>
+            <!-- Colour theme chooser -->
+            <li class="nav-item dropdown">
+              <button class="btn btn-link nav-link dropdown-toggle"
+                      id="bd-theme" type="button" aria-expanded="false"
+                      data-bs-toggle="dropdown" data-bs-display="static"
+                      aria-label="Toggle theme (auto)">
+                <i class="fas fa-adjust"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow"
+                  aria-labelledby="bd-theme-text">
+                <li>
+                  <button type="button" class="dropdown-item"
+                          data-bs-theme-value="light" aria-pressed="false">
+                    <i class="fas fa-sun"></i> Light
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item"
+                          data-bs-theme-value="dark" aria-pressed="false">
+                    <i class="fas fa-moon"></i> Dark
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item active"
+                          data-bs-theme-value="auto" aria-pressed="true">
+                    <i class="fas fa-adjust"></i> Auto
+                  </button>
+                </li>
+              </ul>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" id="navbarInfoDropdown"
@@ -167,8 +197,9 @@
               <table id="discreteData">
                 <!-- Stats -->
                 <tfoot>
-                  <tr class="bg-ambient bg-gradient text-white">
-                    <td colspan="4">
+                  <tr>
+                    <td class="text-body-secondary bg-body-secondary"
+                        colspan="4">
                       <ul class="list-inline text-center mb-1">
                         <li class="list-inline-item">
                           <span id="deviceCount" class="display-5"> 0 </span>
@@ -188,7 +219,7 @@
               <!-- Continuous -->
               <table id="continuousData">
                 <thead>
-                  <tr class="border border-bottom border-0">
+                  <tr>
                     <th class="display-1 bg-primary bg-gradient text-white"
                         colspan="3">
                       <img src="images/pareto-anywhere-for-azure-logo-white.png"
@@ -202,24 +233,24 @@
               <div class="card rounded-4 border-0 bg-ambient bg-gradient my-5">
                 <div class="card-body">
                   <div class="card-group text-center">
-                    <div class="card bg-white border-0">
+                    <div class="card text-body-secondary border-0">
                       <img src="images/dtpr-purpose-inform.svg"
-                           class="card-img-top p-2" alt="Purpose">
-                      <div class="card-footer small text-truncate bg-transparent border-0">
+                           class="card-img-top bg-white p-2" alt="Purpose">
+                      <div class="card-footer text-truncate bg-gradient border-0">
                         Inform
                       </div>
                     </div>
-                    <div class="card bg-white border-0">
+                    <div class="card text-body-secondary border-0">
                       <img src="images/dtpr-tech-wave-yellow.svg"
-                           class="card-img-top p-2" alt="Technology">
-                      <div class="card-footer small text-truncate bg-transparent border-0">
+                           class="card-img-top bg-white p-2" alt="Technology">
+                      <div class="card-footer text-truncate bg-gradient border-0">
                         Radio-identification
                       </div>
                     </div>
-                    <div class="card bg-white border-0">
-                      <img src="images/dtpr-accountable-org.svg"
-                           class="card-img-top p-2" alt="Accountable">
-                      <div class="card-footer small text-truncate bg-transparent border-0">
+                    <div class="card text-body-secondary border-0">
+                      <img src="images/dtpr-accountable-reelyactive.png"
+                           class="card-img-top bg-white p-2" alt="Accountable">
+                      <div class="card-footer text-truncate bg-gradient border-0">
                         <a href="https://www.reelyactive.com/how-we-observe/#content"
                            target="_blank" class="text-decoration-none">
                           <i class="fas fa-external-link-alt"></i>
@@ -227,10 +258,10 @@
                         </a>
                       </div>
                     </div>
-                    <div class="card bg-white border-0">
+                    <div class="card text-body-secondary border-0">
                       <img src="images/dtpr-retention-no.svg"
-                           class="card-img-top p-2" alt="Retention">
-                      <div class="card-footer small text-truncate bg-transparent border-0">
+                           class="card-img-top bg-white p-2" alt="Retention">
+                      <div class="card-footer text-truncate bg-gradient border-0">
                         No data retained
                       </div>
                     </div>
