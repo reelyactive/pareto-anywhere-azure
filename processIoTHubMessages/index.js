@@ -32,7 +32,7 @@ const DEFAULT_DYNAMB_PROPERTIES = [
     'angleOfRotation',
     'batteryPercentage',
     'batteryVoltage',
-    'carbonDioxideConcentration,
+    'carbonDioxideConcentration',
     'elevation',
     'heading',
     'heartRate',
