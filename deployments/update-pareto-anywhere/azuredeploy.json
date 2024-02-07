@@ -52,6 +52,10 @@
             "defaultValue": "https://raw.githubusercontent.com/reelyactive/pareto-anywhere-azure/master/deployments/pareto-anywhere-azure/packages/function-app.zip"
         }
     },
+    "variables": {
+        "planName": "[concat('pareto-anywhere-pln', uniqueString(resourceGroup().id))]", 
+        "iotHubKey": "iothubowner"
+    },
     "resources": [
         {
             "type": "Microsoft.Web/sites",
