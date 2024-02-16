@@ -1,0 +1,9 @@
+{
+  "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+  "type": "QuickStart",
+  "itemDisplayName": "Redeploy Pareto Anywhere for Azure",
+  "description": "This template updates, within an existing Resource Group having a Pareto Anywhere for Azure Function App, the Function App via zip deploy.",
+  "summary": "Redeploy an existing instance of Pareto Anywhere for Azure with the latest version on GitHub.",
+  "githubUsername": "reelyactive",
+  "dateUpdated": "2024-02-16"
+}
