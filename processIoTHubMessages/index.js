@@ -73,12 +73,12 @@ module.exports = function(context, iotHubMessages) {
     let timestamp = Date.parse(messageDate);
     let dynambs = [];
 
-    // Handle Aruba bleData
+    // Handle Aruba bleData (AOS 8)
     if(Array.isArray(message.bleData)) {
       dynambs = processBleData(message.bleData, properties, timestamp);
     }
 
-    // Handle Aruba serialData
+    // Handle Aruba serialData (AOS 8)
     else if(Array.isArray(message.serialData)) {
 
       // EnOcean USB dongle (TODO: differentiate serialDataNb & actionResults)
@@ -87,6 +87,13 @@ module.exports = function(context, iotHubMessages) {
                              timestamp, context.bindings.deviceProfilesEnOcean);
       }
 
+    }
+
+    // Handle Aruba result (AOS 10)
+    else if(message.hasOwnProperty('result') &&
+            message.result.hasOwnProperty('mac') &&
+            message.result.hasOwnProperty('payload')) {
+      dynambs = processResult(message.result, properties, timestamp);
     }
 
     // Output the DYNamic AMBient data message(s)
@@ -162,6 +169,26 @@ function processEnOceanSerialData(packets, properties, timestamp,
   });
 
   return dynambs;
+}
+
+
+/**
+ * Process the given result data.
+ * @param {Object} result The result data.
+ * @param {Object} properties The Aruba IoT transport properties.
+ * @param {Number} timestamp The timestamp of the radio packet reception.
+ * @return {Array} The compiled dynamb objects.
+ */
+function processResult(result, properties, timestamp) {
+  let deviceId = result.mac.replaceAll(':', '');
+  let deviceIdType = 2; // TODO: distinguish between EUI-48 and RND-48
+  let payload = Buffer.from(result.payload, 'base64');
+  let processedPayload = advlib.process(payload, BLE_PROCESSORS,
+                                        INTERPRETERS);
+  let dynamb = compileDynamb(deviceId, deviceIdType, processedPayload,
+                             timestamp);
+
+  return [ dynamb ];
 }
 
 
