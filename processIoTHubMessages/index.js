@@ -120,6 +120,7 @@ module.exports = function(context, iotHubMessages) {
  * @return {Array} The compiled dynamb objects.
  */
 function processBleData(packets, properties, timestamp) {
+  let dynambs = [];
   let deviceId = properties.deviceIdentifier.replaceAll(':', '');
   let deviceIdType = 2;
   let payloads = [];
@@ -133,8 +134,11 @@ function processBleData(packets, properties, timestamp) {
                                          INTERPRETERS);
   let dynamb = compileDynamb(deviceId, deviceIdType, processedPayloads,
                              timestamp);
+  if(dynamb) {
+    dynambs.push(dynamb);
+  }
 
-  return [ dynamb ];
+  return dynambs;
 }
 
 
@@ -163,8 +167,12 @@ function processEnOceanSerialData(packets, properties, timestamp,
 
       // TODO: update deviceProfiles when eepType is received in UTE telegram
 
-      dynambs.push(compileDynamb(deviceId, deviceIdType, processedPayload,
-                                 timestamp));
+      let dynamb = compileDynamb(deviceId, deviceIdType, processedPayload,
+                                 timestamp);
+
+      if(dynamb) {
+        dynambs.push(dynamb);
+      }
     }
   });
 
@@ -180,6 +188,7 @@ function processEnOceanSerialData(packets, properties, timestamp,
  * @return {Array} The compiled dynamb objects.
  */
 function processResult(result, properties, timestamp) {
+  let dynambs = [];
   let deviceId = result.mac.replaceAll(':', '');
   let deviceIdType = 2; // TODO: distinguish between EUI-48 and RND-48
   let payload = Buffer.from(result.payload, 'base64');
@@ -187,8 +196,11 @@ function processResult(result, properties, timestamp) {
                                         INTERPRETERS);
   let dynamb = compileDynamb(deviceId, deviceIdType, processedPayload,
                              timestamp);
+  if(dynamb) {
+    dynambs.push(dynamb);
+  }
 
-  return [ dynamb ];
+  return dynambs;
 }
 
 
@@ -204,12 +216,14 @@ function compileDynamb(deviceId, deviceIdType, data, timestamp) {
   let dynamb = { deviceId: deviceId,
                  deviceIdType: deviceIdType,
                  timestamp: timestamp };
+  let isDynambPropertyPresent = false;
 
   for(const property in data) {
     if(DEFAULT_DYNAMB_PROPERTIES.includes(property)) {
       dynamb[property] = data[property];
+      isDynambPropertyPresent = true;
     }
   }
 
-  return dynamb;
+  return isDynambPropertyPresent ? dynamb : null;
 }
