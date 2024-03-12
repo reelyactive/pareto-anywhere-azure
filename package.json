@@ -18,7 +18,8 @@
     "url": "https://github.com/reelyactive/pareto-anywhere-azure.git"
   },
   "scripts": {
-    "start": "func start"
+    "start": "func start",
+    "function-app-zip": "zip -u deployments/pareto-anywhere-azure/packages/function-app.zip host.json package.json LICENSE README.md -r negotiateConnection -r processIoTHubMessages -r serveWebApp"
   },
   "dependencies": {
     "advlib": "^1.3.4",
