@@ -101,7 +101,11 @@ module.exports = function(context, iotHubMessages) {
       let event = { type: "dynamb", data: dynamb };
       let eventString = JSON.stringify(event);
 
-      context.bindings.eventHubMessage = eventString;
+      // Output only valid dynambs to the Event Hub
+      if(isDynambPropertyPresent(dynamb)) {
+        context.bindings.eventHubMessage = eventString;
+      }
+      // Output everything to the WebPubSub to facilitate device monitoring
       context.bindings.actions = { actionName: "sendToAll",
                                    data: eventString };
     });
@@ -205,6 +209,22 @@ function processResult(result, properties, timestamp) {
 
 
 /**
+ * Verify if the given dynamb has at least one dynamb-specific property.
+ * @param {Object} dynamb The dynamb to verify.
+ * @return {boolean} True if at least one dynamb-specific property is present.
+ */
+function isDynambPropertyPresent(dynamb) {
+  for(const property in dynamb) {
+    if(DEFAULT_DYNAMB_PROPERTIES.includes(property)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+/**
  * Compile dynamic ambient (dynamb) data object from device id & data.
  * @param {String} deviceId The device identifier.
  * @param {Number} deviceIdType The type of device identifier (see raddec).
@@ -216,14 +236,12 @@ function compileDynamb(deviceId, deviceIdType, data, timestamp) {
   let dynamb = { deviceId: deviceId,
                  deviceIdType: deviceIdType,
                  timestamp: timestamp };
-  let isDynambPropertyPresent = false;
 
   for(const property in data) {
     if(DEFAULT_DYNAMB_PROPERTIES.includes(property)) {
       dynamb[property] = data[property];
-      isDynambPropertyPresent = true;
     }
   }
 
-  return isDynambPropertyPresent ? dynamb : null;
+  return dynamb;
 }
