@@ -98,7 +98,7 @@ With the Azure CLI installed, push __pareto-anywhere-azure__ to Azure with the f
 
 Initially, and anytime there are changes to local.settings.json, append the flag ```--publish-local-settings -i``` to the above.
 
-Browse to ```<APP_NAME>.azurewebsites.net/app/``` to observe data in the web app served by the function, and to ```<APP_NAME>.azurewebsites.net/app/``` to observe the individual detected devices and their respective JSON data.
+Browse to ```<APP_NAME>.azurewebsites.net/app/``` to observe data in the web app served by the function, and to ```<APP_NAME>.azurewebsites.net/app/status/``` to observe the individual detected devices and their respective JSON data.
 
 
 Data Structure
