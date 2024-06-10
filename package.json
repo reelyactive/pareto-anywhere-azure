@@ -12,7 +12,7 @@
     "IoT Hub",
     "advlib"
   ],
-  "version": "1.5.0",
+  "version": "1.5.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/reelyactive/pareto-anywhere-azure.git"
@@ -28,12 +28,12 @@
     "advlib-ble-services": "^1.4.2",
     "advlib-interoperable": "^1.4.0",
     "advlib-esp": "^1.3.0",
-    "advlib-eep-vld": "^1.2.0",
+    "advlib-eep-vld": "^1.2.1",
     "advlib-eep-4bs": "^1.3.0",
     "advlib-eep-rps": "^1.0.1",
     "advlib-eep-msc": "^1.1.1",
     "mime-types": "^2.1.35",
-    "sniffypedia": "^1.1.8"
+    "sniffypedia": "^1.1.9"
   },
   "devDependencies": {
     "azure-functions-core-tools": "^4.x"
