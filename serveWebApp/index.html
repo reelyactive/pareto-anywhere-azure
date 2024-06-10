@@ -13,21 +13,90 @@
         const res = await fetch(`/app/wsconnection?id=${1}`);
         const data = await res.json();
 
+        const CONTINUOUS_HISTORY_MILLISECONDS = 60000;
+        const CONTINUOUS_UPDATE_MILLISECONDS = 5000;
+        const CONTINUOUS_PROPERTIES = [ 'temperature', 'relativeHumidity',
+                                        'illuminance', 'batteryPercentage' ];
+
         const deviceCount = document.querySelector('#deviceCount');
         const dynambRate = document.querySelector('#dynambRate');
 
+        let devices = new Map();
         let continuousDataTable = new ContinuousDataTable('#continuousData',
-                                                          beaver.devices);
+                                                          devices);
         let discreteDataTable = new DiscreteDataTable('#discreteData',
                                        { isClockDisplayed: true, maxRows: 10 });
 
         beaver.stream(null, { wsUrl: data.url });
         beaver.on('connect', () => { connection.hidden = false; });
-        beaver.on('dynamb', (dynamb) => discreteDataTable.handleDynamb(dynamb));
+        beaver.on('dynamb', (dynamb) => {
+          discreteDataTable.handleDynamb(dynamb);
+          updateDevices(dynamb);
+        });
         beaver.on('stats', (stats) => {
           deviceCount.textContent = stats.numberOfDevices;
           dynambRate.textContent = stats.eventsPerSecond.dynamb.toFixed(1);
         });
+
+        setTimeout(removeStaleDevicesData, CONTINUOUS_UPDATE_MILLISECONDS);
+
+        function updateDevices(dynamb) {
+          let deviceSignature = dynamb.deviceId + '/' + dynamb.deviceIdType;
+          let continuousDataProperties = [];
+
+          CONTINUOUS_PROPERTIES.forEach((property) => {
+            if(dynamb.hasOwnProperty(property)) {
+              continuousDataProperties.push(property);
+            };
+          });
+
+          if(continuousDataProperties.length === 0) return;
+
+          if(!devices.has(deviceSignature)) {
+            devices.set(deviceSignature, { dynamb: {}, properties: {} });
+          }
+
+          let device = devices.get(deviceSignature);
+          continuousDataProperties.forEach((property) => {
+            if(!device.properties.hasOwnProperty(property) ||
+               (device.properties[property].timestamp < dynamb.timestamp)) {
+              device.properties[property] = { value: dynamb[property],
+                                              timestamp: dynamb.timestamp };
+            }
+          });
+
+          for(const property in device.properties) {
+            device.dynamb[property] = device.properties[property].value;
+          }
+
+          if(!device.dynamb.hasOwnProperty('timestamp') ||
+             (device.dynamb.timestamp < dynamb.timestamp)) {
+            device.dynamb.timestamp = dynamb.timestamp;
+          }
+        }
+
+        function removeStaleDevicesData() {
+          let staleTimestamp = Date.now() - CONTINUOUS_HISTORY_MILLISECONDS;
+
+          devices.forEach((device, deviceSignature) => {
+            let isStale = device.dynamb.timestamp < staleTimestamp;
+            if(isStale) {
+              devices.delete(deviceSignature);
+            }
+            else {
+              for(const property in device.properties) {
+                isStale = (device.properties[property].timestamp <
+                           staleTimestamp);
+                if(isStale) {
+                  delete device.properties[property];
+                  delete device.dynamb[property];
+                }
+              }
+            }
+          });
+
+          setTimeout(removeStaleDevicesData, CONTINUOUS_UPDATE_MILLISECONDS);
+        }
       });
     </script>
     <title> Pareto Anywhere for Azure </title>
