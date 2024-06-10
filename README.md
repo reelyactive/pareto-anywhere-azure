@@ -86,7 +86,7 @@ With the Azure CLI installed, run __pareto-anywhere-azure__ locally from its roo
 
     func start
 
-Then browse to [localhost:7071/app/](http://localhost:7071/app/) to observe data in the web app served by the function.
+Then browse to [localhost:7071/app/](http://localhost:7071/app/) to observe data in the web app served by the function, and to [localhost:7071/app/status/](http://localhost:7071/app/status/) to observe the individual detected devices and their respective JSON data.
 
 
 Running on Azure
@@ -98,7 +98,7 @@ With the Azure CLI installed, push __pareto-anywhere-azure__ to Azure with the f
 
 Initially, and anytime there are changes to local.settings.json, append the flag ```--publish-local-settings -i``` to the above.
 
-Browse to ```<APP_NAME>.azurewebsites.net/app/``` to observe data in the web app served by the function.
+Browse to ```<APP_NAME>.azurewebsites.net/app/``` to observe data in the web app served by the function, and to ```<APP_NAME>.azurewebsites.net/app/``` to observe the individual detected devices and their respective JSON data.
 
 
 Data Structure
@@ -127,14 +127,14 @@ An example of an event from a temperature & humidity sensor would be as follows:
     }
 
 
-Web App
--------
+Web Apps
+--------
 
-The web app provides an intuitive visualisation of the real-time event stream:
+The web apps provide an intuitive visualisation of the real-time event stream:
 
 ![Pareto Anywhere for Azure web app](https://reelyactive.github.io/pareto-anywhere-azure/images/web-app-screenshot.png)
 
-The web app and all its dependencies are served by the Azure Function itself from the /serveWebApp folder and its subfolders.  Simply edit the index.html file and the dependencies as required, and the changes will appear as soon as the function restarts.
+The web apps and all their dependencies are served by the Azure Function itself from the /serveWebApp folder and its subfolders.  Simply edit the index.html files and the dependencies as required, and the changes will appear as soon as the function restarts.
 
 See the [reelyActive Web Style Guide](https://reelyactive.github.io/web-style-guide/) to facilitate customisation, and the [beaver.js](https://github.com/reelyactive/beaver/) and [cuttlefish.js](https://github.com/reelyactive/cuttlefish/) client-side modules which collect and render the real-time dynamic ambient data, respectively.
 
