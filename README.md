@@ -134,6 +134,12 @@ The web apps provide an intuitive visualisation of the real-time event stream:
 
 ![Pareto Anywhere for Azure web app](https://reelyactive.github.io/pareto-anywhere-azure/images/web-app-screenshot.png)
 
+Browse to the web apps at:
+- ```<APP_NAME>.azurewebsites.net/app/```
+- ```<APP_NAME>.azurewebsites.net/app/status/```
+
+Be sure to include the trailing slash (/) to ensure the web content is loaded correctly.
+
 The web apps and all their dependencies are served by the Azure Function itself from the /serveWebApp folder and its subfolders.  Simply edit the index.html files and the dependencies as required, and the changes will appear as soon as the function restarts.
 
 See the [reelyActive Web Style Guide](https://reelyactive.github.io/web-style-guide/) to facilitate customisation, and the [beaver.js](https://github.com/reelyactive/beaver/) and [cuttlefish.js](https://github.com/reelyactive/cuttlefish/) client-side modules which collect and render the real-time dynamic ambient data, respectively.
