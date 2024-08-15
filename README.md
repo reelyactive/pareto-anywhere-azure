@@ -35,13 +35,13 @@ __Pareto Anywhere for Azure__ can be deployed in minutes to an Azure Resource Gr
 
 If the Azure Resource Group already includes an IoT Hub, skip ahead to Step 2.  Otherwise, either manually create an IoT Hub or deploy one to a Resource Group via ARM template by clicking the Deploy link below:
 
-[![Deploy IoT Hub and DPS](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fiot-hub-dps%2Fazuredeploy.json)
+[![Deploy IoT Hub and DPS](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fiot-hub-dps%2Fazuredeploy.json)
 
 ### Step 2: Deploy Pareto Anywhere for Azure and supporting resources
 
 Deploy to a Resource Group via ARM template by clicking the Deploy link below:
 
-[![Deploy Pareto Anywhere for Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fpareto-anywhere-azure%2Fazuredeploy.json)
+[![Deploy Pareto Anywhere for Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fpareto-anywhere-azure%2Fazuredeploy.json)
 
 The ARM template will deploy the __pareto-anywhere-azure__ Azure Function under the Windows Consumption plan which strikes a balance between installation ease & speed, and operational costs.  Consult the official [ARM template documentation](https://learn.microsoft.com/azure/azure-resource-manager/templates/) or contact your Microsoft rep to adapt these templates to your requirements.
 
@@ -51,7 +51,7 @@ Update an existing deployment
 
 Update an existing deployment's function app to the latest version of __Pareto Anywhere for Azure__ via ARM template by clicking the Deploy link below:
 
-[![Redeploy Pareto Anywhere for Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fupdate-pareto-anywhere%2Fazuredeploy.json)
+[![Redeploy Pareto Anywhere for Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Freelyactive%2Fpareto-anywhere-azure%2Fmaster%2Fdeployments%2Fupdate-pareto-anywhere%2Fazuredeploy.json)
 
 
 Manual Installation
