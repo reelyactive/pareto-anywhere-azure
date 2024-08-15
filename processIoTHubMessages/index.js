@@ -86,14 +86,23 @@ module.exports = function(context, iotHubMessages) {
         dynambs = processEnOceanSerialData(message.serialData, properties,
                              timestamp, context.bindings.deviceProfilesEnOcean);
       }
-
     }
 
     // Handle Aruba result (AOS 10)
-    else if(message.hasOwnProperty('result') &&
-            message.result.hasOwnProperty('mac') &&
-            message.result.hasOwnProperty('payload')) {
-      dynambs = processResult(message.result, properties, timestamp);
+    else if(message.hasOwnProperty('result')) {
+      let result = message.result;
+
+      // Bluetooth Low Energy (AOS 10)
+      if(result.hasOwnProperty('mac') && result.hasOwnProperty('payload')) {
+        dynambs = processBleResult(result, properties, timestamp);
+      }
+
+      // Serial (AOS 10)
+      else if(result.hasOwnProperty('apMac') && result.hasOwnProperty('data') &&
+              result.hasOwnProperty('hardwareId')) {
+        dynambs = processSerialResult(result, properties, timestamp,
+                                      context.bindings.deviceProfilesEnOcean);
+      }
     }
 
     // Output the DYNamic AMBient data message(s)
@@ -185,13 +194,13 @@ function processEnOceanSerialData(packets, properties, timestamp,
 
 
 /**
- * Process the given result data.
+ * Process the given Bluetooth Low Energy result data.
  * @param {Object} result The result data.
  * @param {Object} properties The Aruba IoT transport properties.
  * @param {Number} timestamp The timestamp of the radio packet reception.
  * @return {Array} The compiled dynamb objects.
  */
-function processResult(result, properties, timestamp) {
+function processBleResult(result, properties, timestamp) {
   let dynambs = [];
   let deviceId = result.mac.replaceAll(':', '');
   let deviceIdType = 2; // TODO: distinguish between EUI-48 and RND-48
@@ -202,6 +211,44 @@ function processResult(result, properties, timestamp) {
                              timestamp);
   if(dynamb) {
     dynambs.push(dynamb);
+  }
+
+  return dynambs;
+}
+
+
+/**
+ * Process the given serial result data.
+ * @param {Object} result The result data.
+ * @param {Object} properties The Aruba IoT transport properties.
+ * @param {Number} timestamp The timestamp of the radio packet reception.
+ * @param {Object} deviceProfiles The EnOcean device profiles with EEP types.
+ * @return {Array} The compiled dynamb objects.
+ */
+function processSerialResult(result, properties, timestamp, deviceProfiles) {
+  let dynambs = [];
+
+  // TODO: distinguish between EnOcean and other serial protocols, when possible
+  //       Not all serial data is EnOcean data!
+  let processor = Object.assign({}, ENOCEAN_PROCESSOR);
+  processor.options.deviceProfiles = deviceProfiles;
+
+  let payload = Buffer.from(result.data, 'base64');
+  let processedPayload = advlib.process(payload, [ processor ]);
+
+  if(Array.isArray(processedPayload.deviceIds)) {
+    let deviceIdElements = processedPayload.deviceIds[0].split('/');
+    let deviceId = deviceIdElements[0];
+    let deviceIdType = parseInt(deviceIdElements[1]);
+
+    // TODO: update deviceProfiles when eepType is received in UTE telegram
+
+    let dynamb = compileDynamb(deviceId, deviceIdType, processedPayload,
+                               timestamp);
+
+    if(dynamb) {
+      dynambs.push(dynamb);
+    }
   }
 
   return dynambs;
