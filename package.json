@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "advlib": "^1.3.4",
-    "advlib-ble": "^1.3.1",
-    "advlib-ble-manufacturers": "^1.6.1",
+    "advlib-ble": "^1.4.0",
+    "advlib-ble-manufacturers": "^1.7.1",
     "advlib-ble-services": "^1.4.2",
     "advlib-interoperable": "^1.4.0",
     "advlib-esp": "^1.3.0",
